@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChewCombine V2", "ChewCombine V2\ChewCombine V2.csproj", "{82721637-7490-417B-B209-29BB0F96B493}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{82721637-7490-417B-B209-29BB0F96B493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82721637-7490-417B-B209-29BB0F96B493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82721637-7490-417B-B209-29BB0F96B493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82721637-7490-417B-B209-29BB0F96B493}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3CA38840-9FAE-4BA1-9D5B-3C7E4B8B1DE2}
+	EndGlobalSection
+EndGlobal
