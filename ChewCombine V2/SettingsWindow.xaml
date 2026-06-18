@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        Title="设置" Height="420" Width="500"
+        Title="设置" Height="500" Width="520"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource ApplicationBackgroundBrush}"
         Foreground="{DynamicResource TextFillColorPrimaryBrush}">
@@ -14,44 +14,110 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ui:TextBlock Text="设置喵" FontTypography="Title" Margin="0,10,0,20" />
+        <ui:TextBlock Text="高级设置喵" FontTypography="Title" Margin="0,5,0,15" />
 
-        <StackPanel Grid.Row="1">
-            <StackPanel Margin="0,0,0,20">
-                <ui:TextBlock Text="Rest audio 路径" FontWeight="Medium" Margin="0,0,0,8" />
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <ui:TextBox x:Name="RestPathTextBox" Grid.Column="0" PlaceholderText="请选择音频..." IsReadOnly="True" />
-                    <ui:Button Grid.Column="1" Click="SelectRestAudio_Click" ToolTip="导入新音频">
-                        <ui:SymbolIcon Symbol="Folder24" />
-                    </ui:Button>
-                </Grid>
-                <ComboBox x:Name="RestAudioComboBox" Margin="0,10,0,0" SelectionChanged="RestAudioComboBox_SelectionChanged" />
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,15">
+            <StackPanel Margin="0,0,12,0">
+
+                <StackPanel Margin="0,0,0,16">
+                    <ui:TextBlock Text="Rest audio 路径" FontWeight="Medium" Margin="0,0,0,6" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox x:Name="RestPathTextBox" Grid.Column="0" PlaceholderText="请选择音频..." IsReadOnly="True" />
+                        <ui:Button Grid.Column="1" Click="SelectRestAudio_Click" ToolTip="导入新音频">
+                            <ui:SymbolIcon Symbol="Folder24" />
+                        </ui:Button>
+                    </Grid>
+                    <ComboBox x:Name="RestAudioComboBox" Margin="0,6,0,0" SelectionChanged="RestAudioComboBox_SelectionChanged" />
+                </StackPanel>
+
+                <Separator Margin="0,5,0,15" Opacity="0.3"/>
+
+                <ui:TextBlock Text="谱面基本设置" FontTypography="Subtitle" FontWeight="Bold" Margin="0,0,0,16" />
+
+                <StackPanel Margin="0,0,0,16">
+                    <ui:TextBlock Text="BackGround 路径" FontWeight="Medium" Margin="0,0,0,6" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox x:Name="BgPathTextBox" Grid.Column="0" PlaceholderText="请选择背景图..." IsReadOnly="True" />
+                        <ui:Button Grid.Column="1" Click="SelectBgImage_Click" ToolTip="导入新图片">
+                            <ui:SymbolIcon Symbol="Folder24" />
+                        </ui:Button>
+                    </Grid>
+                    <ComboBox x:Name="BgComboBox" Margin="0,6,0,0" SelectionChanged="BgComboBox_SelectionChanged" />
+                </StackPanel>
+
+                <!-- 谱面标题 -->
+                <StackPanel Margin="0,0,0,16">
+                    <ui:TextBlock Text="谱面标题 (Title)" FontWeight="Medium" Margin="0,0,0,6" />
+                    <ui:TextBox x:Name="TitleTextBox" PlaceholderText="请输入合并后的谱面标题..." TextChanged="TitleTextBox_TextChanged" />
+                </StackPanel>
+
+                <!-- 谱师 -->
+                <StackPanel Margin="0,0,0,16">
+                    <ui:TextBlock Text="谱师 (Creator)" FontWeight="Medium" Margin="0,0,0,6" />
+                    <ui:TextBox x:Name="CreatorTextBox" PlaceholderText="请输入谱师名字..." TextChanged="CreatorTextBox_TextChanged" />
+                </StackPanel>
+
+                <!-- 游戏模式 -->
+                <StackPanel Margin="0,0,0,16">
+                    <ui:TextBlock Text="游戏模式 (Mode)" FontWeight="Medium" Margin="0,0,0,6" />
+                    <ComboBox x:Name="ModeComboBox" SelectionChanged="ModeComboBox_SelectionChanged">
+                        <ComboBoxItem Content="osu!Standard" Tag="0"/>
+                        <ComboBoxItem Content="osu!taiko" Tag="1"/>
+                        <ComboBoxItem Content="osu!catch" Tag="2"/>
+                        <ComboBoxItem Content="osu!mania" Tag="3"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- 多K -->
+                <StackPanel x:Name="KeysSettingsPanel" Margin="0,0,0,16">
+                    <Grid Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBlock Text="Mania Keys" FontWeight="Medium" Grid.Column="0"/>
+                        <ui:TextBlock x:Name="KeysValueText" Text="4K" FontWeight="Medium" Foreground="Gray" Grid.Column="1"/>
+                    </Grid>
+                    <Slider x:Name="KeysSlider" Minimum="1" Maximum="10" Value="4" IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="KeysSlider_ValueChanged"/>
+                </StackPanel>
+
+                <!-- OD -->
+                <StackPanel Margin="0,0,0,16">
+                    <Grid Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBlock Text="OD" FontWeight="Medium" Grid.Column="0"/>
+                        <ui:TextBlock x:Name="OdValueText" Text="9.0" FontWeight="Medium" Foreground="Gray" Grid.Column="1"/>
+                    </Grid>
+                    <Slider x:Name="OdSlider" Minimum="0" Maximum="10" Value="9" IsSnapToTickEnabled="False" TickFrequency="0.1" ValueChanged="OdSlider_ValueChanged"/>
+                </StackPanel>
+
+                <!-- HP -->
+                <StackPanel Margin="0,0,0,16">
+                    <Grid Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBlock Text="HP" FontWeight="Medium" Grid.Column="0"/>
+                        <ui:TextBlock x:Name="HpValueText" Text="8.0" FontWeight="Medium" Foreground="Gray" Grid.Column="1"/>
+                    </Grid>
+                    <Slider x:Name="HpSlider" Minimum="0" Maximum="10" Value="8" IsSnapToTickEnabled="False" TickFrequency="0.1" ValueChanged="HpSlider_ValueChanged"/>
+                </StackPanel>
+
             </StackPanel>
+        </ScrollViewer>
 
-            <StackPanel>
-                <ui:TextBlock Text="BackGround 路径" FontWeight="Medium" Margin="0,0,0,8" />
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <ui:TextBox x:Name="BgPathTextBox" Grid.Column="0" PlaceholderText="请选择背景图..." IsReadOnly="True" />
-                    <ui:Button Grid.Column="1" Click="SelectBgImage_Click" ToolTip="导入新图片">
-                        <ui:SymbolIcon Symbol="Folder24" />
-                    </ui:Button>
-                </Grid>
-                <ComboBox x:Name="BgComboBox" Margin="0,10,0,0" SelectionChanged="BgComboBox_SelectionChanged" />
-            </StackPanel>
-        </StackPanel>
-
-        <ui:Button Grid.Row="2" 
-                   Content="关闭" 
-                   HorizontalAlignment="Right" 
-                   Width="100" 
-                   Click="CloseButton_Click" />
+        <ui:Button Grid.Row="2" Content="关闭" HorizontalAlignment="Right" Width="100" Click="CloseButton_Click" />
     </Grid>
 </Window>

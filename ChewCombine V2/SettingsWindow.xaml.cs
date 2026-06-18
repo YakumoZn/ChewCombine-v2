@@ -3,16 +3,21 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace ChewCombine_V2
 {
     public partial class SettingsWindow : Window
     {
+        private bool _isInitializing = true;
+
         public SettingsWindow()
         {
             InitializeComponent();
             LoadAudios();
             LoadBgs();
+            LoadCustomSettings();
+            _isInitializing = false;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -20,7 +25,85 @@ namespace ChewCombine_V2
             this.Close();
         }
 
-        // ================= 休息段音频逻辑 =================
+
+        private void LoadCustomSettings()
+        {
+            TitleTextBox.Text = MainWindow.CustomTitle;
+            CreatorTextBox.Text = MainWindow.CustomCreator;
+
+            foreach (ComboBoxItem item in ModeComboBox.Items)
+            {
+                if (item.Tag != null && item.Tag.ToString() == MainWindow.CustomMode.ToString())
+                {
+                    ModeComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+
+            KeysSlider.Value = MainWindow.CustomKeys;
+            KeysValueText.Text = $"{MainWindow.CustomKeys}K";
+
+            OdSlider.Value = MainWindow.CustomOD;
+            OdValueText.Text = MainWindow.CustomOD.ToString("F1");
+
+            HpSlider.Value = MainWindow.CustomHP;
+            HpValueText.Text = MainWindow.CustomHP.ToString("F1");
+
+            ToggleKeysPanel(MainWindow.CustomMode == 3);
+        }
+
+        private void TitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_isInitializing) return;
+            MainWindow.CustomTitle = TitleTextBox.Text;
+        }
+
+        private void CreatorTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_isInitializing) return;
+            MainWindow.CustomCreator = CreatorTextBox.Text;
+        }
+
+        private void ModeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ModeComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null)
+            {
+                if (int.TryParse(selectedItem.Tag.ToString(), out int mode))
+                {
+                    if (!_isInitializing) MainWindow.CustomMode = mode;
+                    ToggleKeysPanel(mode == 3);
+                }
+            }
+        }
+
+        private void ToggleKeysPanel(bool isMania)
+        {
+            if (KeysSettingsPanel != null)
+            {
+                KeysSettingsPanel.Visibility = isMania ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        private void KeysSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            int val = (int)Math.Round(e.NewValue);
+            if (KeysValueText != null) KeysValueText.Text = $"{val}K";
+            if (!_isInitializing) MainWindow.CustomKeys = val;
+        }
+
+        private void OdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (OdValueText != null) OdValueText.Text = e.NewValue.ToString("F1");
+            if (!_isInitializing) MainWindow.CustomOD = Math.Round(e.NewValue, 1);
+        }
+
+        private void HpSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (HpValueText != null) HpValueText.Text = e.NewValue.ToString("F1");
+            if (!_isInitializing) MainWindow.CustomHP = Math.Round(e.NewValue, 1);
+        }
+
+        // ================= 休息段音频 =================
 
         private void LoadAudios()
         {
@@ -50,7 +133,7 @@ namespace ChewCombine_V2
                 string safeFileName = Path.GetFileName(openFileDialog.FileName);
                 string targetPath = Path.Combine(relaxDir, safeFileName);
 
-                File.Copy(openFileDialog.FileName, targetPath, true); // 导入并保留原名
+                File.Copy(openFileDialog.FileName, targetPath, true);
 
                 LoadAudios();
                 RestAudioComboBox.SelectedItem = safeFileName;
@@ -58,7 +141,7 @@ namespace ChewCombine_V2
             }
         }
 
-        private void RestAudioComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void RestAudioComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (RestAudioComboBox.SelectedItem != null)
             {
@@ -67,11 +150,11 @@ namespace ChewCombine_V2
                 string fullPath = Path.Combine(relaxDir, selectedFile);
 
                 RestPathTextBox.Text = fullPath;
-                MainWindow.SelectedRestAudioPath = fullPath; // 同步给主程序
+                MainWindow.SelectedRestAudioPath = fullPath;
             }
         }
 
-        // ================= 背景图逻辑 =================
+        // ================= 背景图 =================
 
         private void LoadBgs()
         {
@@ -109,7 +192,7 @@ namespace ChewCombine_V2
             }
         }
 
-        private void BgComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void BgComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (BgComboBox.SelectedItem != null)
             {
@@ -118,7 +201,7 @@ namespace ChewCombine_V2
                 string fullPath = Path.Combine(imgDir, selectedFile);
 
                 BgPathTextBox.Text = fullPath;
-                MainWindow.SelectedBgPath = fullPath; // 同步给主程序
+                MainWindow.SelectedBgPath = fullPath;
             }
         }
     }

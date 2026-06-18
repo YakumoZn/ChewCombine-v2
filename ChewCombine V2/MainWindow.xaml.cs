@@ -15,8 +15,7 @@ using System.Text;
 
 namespace ChewCombine_V2
 {
-
-    //有一半都ai写的
+    //何意为
     public partial class MainWindow : Window
     {
         private ObservableCollection<OsuBeatmap> _allBeatmaps = new ObservableCollection<OsuBeatmap>();
@@ -24,6 +23,13 @@ namespace ChewCombine_V2
         private string _customSongsPath = "";
         public static string SelectedRestAudioPath = "";
         public static string SelectedBgPath = "";
+
+        public static string CustomTitle = "your dans";
+        public static string CustomCreator = "your name";
+        public static int CustomMode = 3;       // 默认 3 (osu!mania)
+        public static int CustomKeys = 4;       // 默认 4K
+        public static double CustomOD = 9.0;    // 默认 OD 9
+        public static double CustomHP = 8.0;    // 默认 HP 8
 
         public MainWindow()
         {
@@ -45,22 +51,13 @@ namespace ChewCombine_V2
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            //string songsPath = @"H:\C\osu!\Songs";
-            //MessageBox.Show($"debug: 路径: {songsPath}");
-
             if (string.IsNullOrEmpty(_customSongsPath))
             {
                 MessageBox.Show("pls click the folder icon to select the Songs path");
                 return;
             }
-            //if (!Directory.Exists(songsPath))
-            //{
-            //    MessageBox.Show("找不到 Songs 文件夹喵！");
-            //    return;
-            //}
 
             _allBeatmaps.Clear();
-            //await Task.Run(() => LoadOsuFiles(songsPath));
             await Task.Run(() => LoadOsuFiles(_customSongsPath));
         }
 
@@ -70,7 +67,7 @@ namespace ChewCombine_V2
             foreach (var file in osuFiles)
             {
                 var beatmap = ParseOsuFile(file);
-                // 神秘传值，看不懂但是大受震撼，这里给ai写的
+                // 神秘传值，看不懂但是大受震撼，gemini大人写的
                 if (beatmap != null)
                 {
                     this.Dispatcher.Invoke(() =>
@@ -80,22 +77,6 @@ namespace ChewCombine_V2
                     });
                 }
             }
-
-            //Dispatcher.Invoke(() =>
-            //{
-            //MessageBox.Show($"debug: 找到了 {osuFiles.Length} 个 .osu 文件喵！");
-            //});
-
-            //foreach (var file in osuFiles)
-            //{
-            //    var beatmap = ParseOsuFile(file);
-            //    if (beatmap != null)
-            //    {
-            //        this.Dispatcher.Invoke(() => _allBeatmaps.Add(beatmap));
-            //        BeatmapCountText.Text = $"当前 osu! 谱面数: {_allBeatmaps.Count}";
-            //    }
-            //}
-
         }
 
         private OsuBeatmap? ParseOsuFile(string filePath) 
@@ -148,27 +129,20 @@ namespace ChewCombine_V2
             settingsWin.ShowDialog();
         }
 
-
         // 搜索这块
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // get当前搜索框里输入的文字
             string searchText = SearchBox.Text.ToLower();
-
-            // 获取绑定到 RightListBox 的数据视图（也就是 _allBeatmaps 的视图）
             ICollectionView view = System.Windows.Data.CollectionViewSource.GetDefaultView(_allBeatmaps);
 
             if (view != null)
             {
-                // 如果搜索框没字，就显示全部
                 if (string.IsNullOrWhiteSpace(searchText))
                 {
                     view.Filter = null;
                 }
                 else
                 {
-                    // 搜索
-                    // 如果谱面的标题,作者或版本包含搜索词
                     view.Filter = (item) =>
                     {
                         var beatmap = item as OsuBeatmap;
@@ -182,13 +156,10 @@ namespace ChewCombine_V2
             }
         }
 
-
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            // 获取点中的那一行对应的数据对象
             if (sender is FrameworkElement element && element.DataContext is OsuBeatmap selectedMap)
             {
-                // 防止重复添加
                 if (!_selectedBeatmaps.Contains(selectedMap))
                 {
                     _selectedBeatmaps.Add(selectedMap);
@@ -205,18 +176,13 @@ namespace ChewCombine_V2
             }
         }
 
-
-
-
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element && element.DataContext is OsuBeatmap map)
             {
-                // 切换展开/折叠状态
                 map.IsExpanded = !map.IsExpanded;
             }
         }
-
 
         // ???? who is [Crz]ChewYakuwo????
         private void GitHubLink_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -229,14 +195,10 @@ namespace ChewCombine_V2
             System.Diagnostics.Process.Start(psi);
         }
 
-
-
-
         //=======================================================================================
         //生成这块，主程是gemini写的，后面一大块函数都是直接复制的V1逻辑
         private async void CombineButton_Click(object sender, RoutedEventArgs e)
         {
-
             // 防呆不防傻
             if (_selectedBeatmaps.Count == 0) return;
 
@@ -244,11 +206,6 @@ namespace ChewCombine_V2
 
             try
             {
-
-                Logger.Info($"Build task started. Selected maps: {_selectedBeatmaps.Count}");
-                //========================
-
-
                 // 定义
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
                 string songsDir = Path.Combine(baseDir, "songs");
@@ -279,7 +236,6 @@ namespace ChewCombine_V2
                     if (File.Exists(sourceAudio))
                         File.Copy(sourceAudio, Path.Combine(folderPath, "audio.mp3"), true);
                 }
-
 
                 await Task.Run(() =>
                 {
@@ -333,10 +289,6 @@ namespace ChewCombine_V2
                     {
                         var map = maps[i];
 
-                        Logger.Info($"[Map {i + 1}/{maps.Count}] Processing folder: {map.FolderName}, Base Offset: {currentOffset}");
-                        //========================
-
-
                         // 音频裁剪
                         string cropped = Path.Combine(tempDir, $"map_{i}_cropped.wav");
                         CropAudio(map.AudioPath, cropped, map.StartMs, map.EndMs);
@@ -346,11 +298,6 @@ namespace ChewCombine_V2
 
                         // 谱面解析
                         ParseOsu(map.OsuPath, out var timings, out var hits);
-                        Logger.Info($"[Map {i + 1}] Parsed {timings.Count} TimingPoints, {hits.Count} HitObjects.");
-                        if (hits.Count == 0)
-                        {
-                            Logger.Warn($"[Map {i + 1}] Warning: 0 HitObjects extracted.");
-                        }
 
                         // TimingPoints 偏移处理
                         foreach (var tp in timings)
@@ -390,14 +337,12 @@ namespace ChewCombine_V2
                         if (i < maps.Count - 1 && restAudio != null)
                         {
                             long restDur = GetAudioDuration(restAudio);
-                            Logger.Info($"[Rest {i}] Custom rest audio loaded. Duration: {restDur}ms");
                             string rCrop = Path.Combine(tempDir, $"rest_{i}_c.wav");
                             CropAudio(restAudio, rCrop, 0, restDur);
                             string rFade = Path.Combine(tempDir, $"rest_{i}_f.wav");
                             AddFade(rCrop, rFade, 1000, 1000);
                             audioSegments.Add(rFade);
                             currentOffset += GetAudioDuration(rFade);
-                            Logger.Info($"[Rest {i}] Rest audio processed. New Base Offset for next map: {currentOffset}");
                         }
                     }
 
@@ -416,12 +361,8 @@ namespace ChewCombine_V2
             catch (Exception ex)
             {
                 MessageBox.Show($"Build failed: {ex.Message}");
-                Logger.Error("Global exception occurred during build.", ex);
             }
         }
-
-
-
 
         static bool TryParseTime(string timeStr, out long ms)
         {
@@ -457,14 +398,7 @@ namespace ChewCombine_V2
             if (!File.Exists(ffmpegPath))
             {
                 ffmpegPath = Path.Combine(genmulu, "ffmpeg", "ffmpeg.exe");
-                //Console.WriteLine($"debug: ffmpeg 路径: {ffmpegPath}");
-
-                // 我是傻逼
             }
-            //if (!File.Exists(ffmpegPath))
-            //{
-            //    throw new Exception("ffmpeg.exe 不存在，请放到程序同目录下");
-            //}
             ProcessStartInfo psi = new ProcessStartInfo
             {
                 FileName = ffmpegPath,
@@ -475,13 +409,10 @@ namespace ChewCombine_V2
             };
             using (Process p = Process.Start(psi))
             {
-
                 string err = p.StandardError.ReadToEnd();
                 p.WaitForExit();
                 if (p.ExitCode != 0)
                 {
-
-                    //Console.WriteLine("debug :：\n" + err);
                     throw new Exception($"FFmpeg 错误: {err}");
                 }
             }
@@ -491,7 +422,6 @@ namespace ChewCombine_V2
         {
             double startSec = startMs / 1000.0;
             double durationSec = (endMs - startMs) / 1000.0;
-            // 强制指定采样率 -ar 44100 和双声道 -ac 2
             RunFFmpeg($"-ss {startSec} -t {durationSec} -i \"{input}\" -vn -ar 44100 -ac 2 -c:a pcm_s16le \"{output}\"");
         }
 
@@ -500,13 +430,11 @@ namespace ChewCombine_V2
             double fadeIn = fadeInMs / 1000.0;
             double totalDur = GetAudioDuration(input) / 1000.0;
             double fadeOutStart = totalDur - (fadeOutMs / 1000.0);
-            // 同样强制指定，防止格式丢失
             RunFFmpeg($"-i \"{input}\" -vn -af \"afade=t=in:st=0:d={fadeIn},afade=t=out:st={fadeOutStart}:d={fadeOutMs / 1000.0}\" -ar 44100 -ac 2 -c:a pcm_s16le \"{output}\"");
         }
 
         static long GetAudioDuration(string audioPath)
         {
-            // 依旧找子文件夹
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string ffmpegPath = Path.Combine(baseDir, "ffmpeg.exe");
             if (!File.Exists(ffmpegPath))
@@ -518,7 +446,6 @@ namespace ChewCombine_V2
                 throw new Exception("找不到 ffmpeg.exe");
             }
 
-            // 使用ffmpeg读取音频时长 输出到stderr 解析duration
             ProcessStartInfo psi = new ProcessStartInfo
             {
                 FileName = ffmpegPath,
@@ -531,7 +458,6 @@ namespace ChewCombine_V2
             {
                 string output = p.StandardError.ReadToEnd();
                 p.WaitForExit();
-                // 在输出中查找 Duration: 00:00:12.34 这样的行
                 var match = Regex.Match(output, @"Duration: (\d{2}):(\d{2}):(\d{2}\.\d+)");
                 if (match.Success)
                 {
@@ -548,16 +474,12 @@ namespace ChewCombine_V2
         {
             string listFile = Path.GetTempFileName();
             File.WriteAllLines(listFile, files.Select(f => $"file '{f}'"));
-            // 输出为OGG 质量 -q:a 3
             RunFFmpeg($"-f concat -safe 0 -i \"{listFile}\" -c:a libvorbis -q:a 3 \"{output}\"");
             File.Delete(listFile);
         }
 
         static void ParseOsu(string osuPath, out List<TimingPoint> timings, out List<HitObject> hits)
         {
-            Logger.Info($"Parsing .osu file: {osuPath}");
-            //=====================
-
             timings = new List<TimingPoint>();
             hits = new List<HitObject>();
             string currentSection = "";
@@ -572,12 +494,10 @@ namespace ChewCombine_V2
                 }
 
                 if (currentSection == "[TimingPoints]" && !string.IsNullOrWhiteSpace(trimmed) && !trimmed.StartsWith("//"))
-                { // 记录当前所在的节（找如 [TimingPoints]等tag）,为什么请看下面
-                  // 笑点解析，之前这里直接暴力搜索导致把背景图"0,0,"Kano.jpg",0,0"也当note算进去了
+                { 
                     string[] parts = trimmed.Split(',');
                     if (parts.Length >= 2 && long.TryParse(parts[0], out long time))
                     {
-
                         timings.Add(new TimingPoint
                         {
                             Time = time,
@@ -604,7 +524,7 @@ namespace ChewCombine_V2
                         string extras = "";
                         if (parts.Length >= 6)
                         {
-                            extras = parts[5]; //
+                            extras = parts[5]; 
                         }
 
                         bool isLong = (type & 128) != 0;
@@ -627,7 +547,6 @@ namespace ChewCombine_V2
                     }
                 }
             }
-            Logger.Info($"Parsing finished. Found {hits.Count} HitObjects.");
         }
         static (long duration, double bpm) GetMapLength(string osuPath, long startMs, long endMs)
         {
@@ -635,7 +554,6 @@ namespace ChewCombine_V2
             double bpm = 120.0;
 
             ParseOsu(osuPath, out var timings, out _);
-            // 优先找裁剪区间内的红线
             foreach (var tp in timings)
             {
                 if (tp.Time >= startMs && tp.Time <= endMs && tp.Uninherited == 1)
@@ -644,7 +562,6 @@ namespace ChewCombine_V2
                     return (duration, bpm);
                 }
             }
-            // 区间内没有，则找第一个红线
             foreach (var tp in timings)
             {
                 if (tp.Uninherited == 1)
@@ -653,7 +570,6 @@ namespace ChewCombine_V2
                     return (duration, bpm);
                 }
             }
-            // 防意外，啥也没有使用120，不然会崩溃
             return (duration, bpm);
         }
 
@@ -670,7 +586,7 @@ namespace ChewCombine_V2
             sb.AppendLine("Countdown: 0");
             sb.AppendLine("SampleSet: None");
             sb.AppendLine("StackLeniency: 0.7");
-            sb.AppendLine("Mode: 3");
+            sb.AppendLine($"Mode: {CustomMode}");
             sb.AppendLine("LetterboxInBreaks: 0");
             sb.AppendLine("SpecialStyle: 0");
             sb.AppendLine("WidescreenStoryboard: 0");
@@ -682,11 +598,11 @@ namespace ChewCombine_V2
             sb.AppendLine("TimelineZoom: 2.5");
             sb.AppendLine();
             sb.AppendLine("[Metadata]");
-            sb.AppendLine("Title:your dans");
-            sb.AppendLine("TitleUnicode:your dans");
+            sb.AppendLine($"Title:{CustomTitle}");
+            sb.AppendLine($"TitleUnicode:{CustomTitle}");
             sb.AppendLine("Artist:V.A");
             sb.AppendLine("ArtistUnicode:V.A");
-            sb.AppendLine("Creator:your name");
+            sb.AppendLine($"Creator:{CustomCreator}");
             sb.AppendLine("Version:chew");
             sb.AppendLine("Source:");
             sb.AppendLine("Tags:");
@@ -694,9 +610,9 @@ namespace ChewCombine_V2
             sb.AppendLine("BeatmapSetID:0");
             sb.AppendLine();
             sb.AppendLine("[Difficulty]");
-            sb.AppendLine("HPDrainRate:8");
-            sb.AppendLine("CircleSize:4");
-            sb.AppendLine("OverallDifficulty:9");
+            sb.AppendLine($"HPDrainRate:{CustomHP.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}");
+            sb.AppendLine($"CircleSize:{CustomKeys}");
+            sb.AppendLine($"OverallDifficulty:{CustomOD.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)}");
             sb.AppendLine("ApproachRate:5");
             sb.AppendLine("SliderMultiplier:1.4");
             sb.AppendLine("SliderTickRate:1");
@@ -724,15 +640,13 @@ namespace ChewCombine_V2
                 string extras = hit.Extras;
                 if (hit.IsLong)
                     extras = $"{hit.EndTime}:0:0:0:0:";
-                //sb.AppendLine($"{hit.X},{hit.Y},{hit.StartTime},{hit.Type},{hit.HitSound},{extras}");
+                
                 if (extras == "")
                 {
-                    // 前5个参数
                     sb.AppendLine($"{hit.X},{hit.Y},{hit.StartTime},{hit.Type},{hit.HitSound}");
                 }
                 else
                 {
-                    // 只有在extras有内容时，才在末尾用逗号把extras连上去
                     sb.AppendLine($"{hit.X},{hit.Y},{hit.StartTime},{hit.Type},{hit.HitSound},{extras}");
                 }
             }
@@ -766,7 +680,7 @@ namespace ChewCombine_V2
         public string AudioPath;
         public long StartMs;
         public long EndMs;
-        public long r_Length;// 裁剪后真实时长
+        public long r_Length;
         public double BaseBPM;
     }
 
